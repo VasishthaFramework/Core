@@ -1,2 +1,2 @@
 # Avayay
-A MVC Framework for building Web Applications on Node.js
+### A MVC Framework less than ~150 sloc for building Web Applications on Node.js
