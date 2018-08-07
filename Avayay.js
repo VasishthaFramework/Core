@@ -10,7 +10,7 @@ const Controller = require('./Controller');
 const Request = require('./Request');
 const Response = require('./Response');
 
-class Avayay extends EventEmitter
+class Vashi extends EventEmitter
 {
     constructor()
     {
@@ -90,4 +90,4 @@ class Avayay extends EventEmitter
     }
 
 }
-module.exports = Avayay;
+module.exports = Vashi;
