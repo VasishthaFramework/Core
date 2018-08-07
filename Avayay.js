@@ -74,7 +74,10 @@ class Avayay extends EventEmitter
                     console.log(`Controller: ${route.pathname}`);
                     const reqw = new Request(request,route);
                     const resw = new Response(response);
-                    controller[method.toLowerCase()](reqw,resw);
+                    if(method.toLowerCase() in controller)
+                    {
+                        controller[method.toLowerCase()](reqw,resw);
+                    }
                 } 
                 else
                 {
