@@ -1,0 +1,10 @@
+{
+    "/":{
+            "controller":"filename.js",
+            "routes":[
+                        "one",
+                        "two",
+                        "three"
+                    ]
+        }
+}
