@@ -1,0 +1,20 @@
+{
+  "name": "avayay",
+  "version": "1.0.0",
+  "description": "A MVC Framework for building Web Applications on Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start":"node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/archanpatkar/Avayay.git"
+  },
+  "author": "Archan Patkar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/archanpatkar/Avayay/issues"
+  },
+  "homepage": "https://github.com/archanpatkar/Avayay#readme"
+}
