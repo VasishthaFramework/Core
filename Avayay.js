@@ -2,6 +2,8 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
+const qs = require('querystring');
+
 const EventEmitter = require('events');
 
 // Framework
@@ -56,10 +58,21 @@ class Avayay extends EventEmitter
         this.server = http.createServer(
             (request,response) => {
                 const route = url.parse(request.url, true);
+                route.post = {};
                 const controller = this.controllers[route.pathname];
                 const method = request.method;
+                if (method == 'POST') {
+                    var body = '';
+                    request.on('data', function (data) {
+                        body += data;
+                    })
+                    request.on('end', function () {
+                        route.post = qs.parse(body);
+                    });
+                }
                 if(controller != undefined)
                 {
+                    console.log(`Controller: ${route.pathname}`);
                     const reqw = new Request(request,route);
                     const resw = new Response(response);
                     controller[method.toLowerCase()](reqw,resw);
