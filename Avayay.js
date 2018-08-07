@@ -75,3 +75,4 @@ class Avayay extends EventEmitter
     }
 
 }
+module.exports = Avayay;
