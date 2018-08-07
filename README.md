@@ -1,3 +1,3 @@
-## <img src="./vashi.png"/>
+### <img src="./vashi.png"/>
 ### Vashi
 ### A MVC Framework less than ~150 sloc for building Web Applications on Node.js
