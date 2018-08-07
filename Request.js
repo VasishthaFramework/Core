@@ -5,7 +5,7 @@ class Request
         this.req = req;
         this.method = req.method;
         this.url = req.url;
-        this.query = route;
+        this.query = route.query;
     }
 }
 module.exports = Request;
