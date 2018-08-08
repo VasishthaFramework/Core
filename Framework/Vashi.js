@@ -49,6 +49,7 @@ class Vashi extends EventEmitter
         {
             throw new Error("The Given Class Should be Instance of Controller");
         }
+        return this;
     }
 
     start(port = 80)
