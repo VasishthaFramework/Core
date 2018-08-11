@@ -36,7 +36,8 @@ class Vashi extends EventEmitter
                 {
                     const temp = this.controllers[path];
                     this.controllers[path] = [];
-                    this.controllers[path].push(temp);
+                    if ( Array.isArray(temp) ) this.controllers[path].push(...temp);
+                    else this.controllers[path].push(temp);
                     this.controllers[path].push(new controller());
                 }
             }
