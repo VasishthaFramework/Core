@@ -1,7 +1,7 @@
 # Vashi
 ### A MVC Framework less than ~150 sloc for building Web Applications on Node.js
 
-### Controller
+### Controllers
 <img src="./vashi.svg">
 
 ### Example
