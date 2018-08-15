@@ -1,0 +1,18 @@
+{
+    "/":{
+            "controller":"file1.js",
+            "routes":[
+                        "one",
+                        "two",
+                        "three"
+                    ]
+        },
+    "/hello":{
+                "controller":"file2.js",
+                "routes":[
+                            "five",
+                            "two",
+                            "six"
+                        ]
+            }
+}
