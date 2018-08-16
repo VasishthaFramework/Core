@@ -1,4 +1,4 @@
-const Controller = require("./Controller");
+const { Controller } = require("../index");
 
 class C1 extends Controller
 {
