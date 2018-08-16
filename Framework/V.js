@@ -1,6 +1,7 @@
 // Dependancies
 const http = require('http');
 const fs = require('fs');
+const path = require("path");
 const url = require('url');
 const qs = require('querystring');
 const EventEmitter = require('events');
@@ -15,17 +16,29 @@ class V extends EventEmitter
     constructor()
     {
         super();
-        this.server = null;
-        this.controllers = {};
-        this.views = {};
+        this._server = null;
+        this._controllers = {};
+        this._views = {};
     }
 
-    addController(path,controller)
+    controllers(folder = "./Controllers")
+    {
+        const abspath = path.resolve(folder);
+        const controllers  = fs.readdirSync(folder);
+        for(let controller of controllers)
+        {
+            this.addController(require(`${abspath}/${controller.split(".")[0]}`))
+        }
+        return this;
+    }
+
+    addController({ path , controller })
     {
         controller = new controller();
         if(controller instanceof Controller)
         {
             this.emit("ControllerAdded",controller);
+            controller.init();
             if(this.controllers[path] != undefined)
             {
                 if(this.controller[path] instanceof Array)
@@ -87,7 +100,7 @@ class V extends EventEmitter
                 }
             }
         ).listen(this.port,'0.0.0.0');
-        this.emit("ServerStarted",this.server);
+        this.emit("Start",this.server);
         return Promise.resolve(this.server);
     }
 
