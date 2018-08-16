@@ -1,4 +1,4 @@
-### <img src="./VasishthaComplete.svg">
+### <img src="./Resources/VasishthaComplete.svg">
 ### A MVC Framework less than ~150 sloc for building Web Applications on Node.js
 
 ## Goal 
