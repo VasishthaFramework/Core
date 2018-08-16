@@ -27,7 +27,8 @@ class V extends EventEmitter
         const controllers  = fs.readdirSync(folder);
         for(let controller of controllers)
         {
-            this.addController(require(`${abspath}/${controller.split(".")[0]}`))
+            controller = controller.split(".").slice(0,controller.length).join(".");
+            this.addController(require(`${abspath}/${controller}`))
         }
         return this;
     }
