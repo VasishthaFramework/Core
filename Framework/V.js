@@ -40,25 +40,7 @@ class V extends EventEmitter
         {
             this.emit("ControllerAdded",controller);
             controller.init();
-            if(this.controllers[path] != undefined)
-            {
-                if(this.controller[path] instanceof Array)
-                {
-                    this.controllers[path].push(new controller());
-                }
-                else 
-                {
-                    const temp = this.controllers[path];
-                    this.controllers[path] = [];
-                    if ( Array.isArray(temp) ) this.controllers[path].push(...temp);
-                    else this.controllers[path].push(temp);
-                    this.controllers[path].push(new controller());
-                }
-            }
-            else
-            {
-                this.controllers[path] = controller; 
-            }
+            this._controllers[path] = controller; 
         }
         else
         {
@@ -70,11 +52,11 @@ class V extends EventEmitter
     start(port = 80)
     {
         this.port = port;
-        this.server = http.createServer(
+        this._server = http.createServer(
             (request,response) => {
                 const route = url.parse(request.url, true);
                 route.post = {};
-                const controller = this.controllers[route.pathname];
+                const controller = this._controllers[route.pathname];
                 const method = request.method;
                 if (method == 'POST') {
                     var body = '';
@@ -101,8 +83,8 @@ class V extends EventEmitter
                 }
             }
         ).listen(this.port,'0.0.0.0');
-        this.emit("Start",this.server);
-        return Promise.resolve(this.server);
+        this.emit("Start",this._server);
+        return Promise.resolve(this._server);
     }
 
 }
