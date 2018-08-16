@@ -21,7 +21,7 @@ class V extends EventEmitter
         this._views = {};
     }
 
-    controllers(folder = "./Controllers")
+    load(folder = "./Controllers")
     {
         const abspath = path.resolve(folder);
         const controllers  = fs.readdirSync(folder);
@@ -40,24 +40,24 @@ class V extends EventEmitter
         {
             this.emit("ControllerAdded",controller);
             controller.init();
-            if(this.controllers[path] != undefined)
+            if(this.load[path] != undefined)
             {
                 if(this.controller[path] instanceof Array)
                 {
-                    this.controllers[path].push(new controller());
+                    this.load[path].push(new controller());
                 }
                 else 
                 {
-                    const temp = this.controllers[path];
-                    this.controllers[path] = [];
-                    if ( Array.isArray(temp) ) this.controllers[path].push(...temp);
-                    else this.controllers[path].push(temp);
-                    this.controllers[path].push(new controller());
+                    const temp = this.load[path];
+                    this.load[path] = [];
+                    if ( Array.isArray(temp) ) this.load[path].push(...temp);
+                    else this.load[path].push(temp);
+                    this.load[path].push(new controller());
                 }
             }
             else
             {
-                this.controllers[path] = controller; 
+                this.load[path] = controller; 
             }
         }
         else
@@ -74,7 +74,7 @@ class V extends EventEmitter
             (request,response) => {
                 const route = url.parse(request.url, true);
                 route.post = {};
-                const controller = this.controllers[route.pathname];
+                const controller = this.load[route.pathname];
                 const method = request.method;
                 if (method == 'POST') {
                     var body = '';
