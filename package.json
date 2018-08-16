@@ -1,20 +1,20 @@
 {
-  "name": "avayay",
+  "name": "@vasishtha/core",
   "version": "1.0.0",
   "description": "A MVC Framework for building Web Applications on Node.js",
-  "main": "test.js",
+  "main": "index.js",
   "scripts": {
-    "start":"node .",
+    "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/archanpatkar/Avayay.git"
+    "url": "git+https://github.com/VasishthaFramework/Core.git"
   },
   "author": "Archan Patkar",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/archanpatkar/Avayay/issues"
+    "url": "https://github.com/VasishthaFramework/Core/issues"
   },
-  "homepage": "https://github.com/archanpatkar/Avayay#readme"
+  "homepage": "https://github.com/VasishthaFramework/Core#readme"
 }
