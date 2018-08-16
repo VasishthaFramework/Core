@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/VasishthaFramework/Core/issues"
   },
-  "homepage": "https://github.com/VasishthaFramework/Core#readme"
+  "homepage": "https://github.com/VasishthaFramework/Core#readme",
+  "dependencies": {
+    "mime-types": "^2.1.19"
+  }
 }
