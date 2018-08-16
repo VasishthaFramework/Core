@@ -2,6 +2,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require("path");
+const mime = require('mime-types');
 const url = require('url');
 const qs = require('querystring');
 const EventEmitter = require('events');
@@ -28,7 +29,18 @@ class V extends EventEmitter
         for(let controller of controllers)
         {
             controller = controller.split(".").slice(0,controller.length).join(".");
-            this.addController(require(`${abspath}/${controller}`))
+            this.addController(require(`${abspath}/${controller}`));
+        }
+        return this;
+    }
+
+    static(folder="./public")
+    {
+        const abspath = path.resolve(folder);
+        const files  = fs.readdirSync(folder);
+        for(let file of files)
+        {
+            this.addFile({ path:file , filepath:`${abspath}/${file}` });
         }
         return this;
     }
@@ -49,16 +61,35 @@ class V extends EventEmitter
         return this;
     }
 
+    addFile({ path , filepath })
+    {
+        if(this._static === undefined) this._static = {};
+        path = "/" + path;
+        this._static[path] = filepath; 
+    }
+
     start(port = 80)
     {
         this.port = port;
         this._server = http.createServer(
             (request,response) => {
                 const route = url.parse(request.url, true);
+                if(this._static !== undefined)
+                {
+                    if(route.pathname in this._static)
+                    {
+                        const filepath = this._static[route.pathname];
+                        const data = fs.readFileSync(filepath).toString();
+                        const type = mime.contentType(path.extname(filepath));
+                        response.setHeader('Content-Type',type);
+                        response.end(data);
+                        return;
+                    }
+                }
                 route.post = {};
                 const controller = this._controllers[route.pathname];
                 const method = request.method;
-                if (method == 'POST') {
+                if (method != 'GET') {
                     var body = '';
                     request.on('data', function (data) {
                         body += data;
