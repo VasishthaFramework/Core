@@ -1,5 +1,5 @@
-const Avayay = require("./Vashi");
+const { V } = require("../index");
 const C1 = require("./C1");
-const a1 = new Vashi();
-a1.addController("/Hello",C1);
-a1.start(9081).then( (server) => console.log("Server has started on PORT: 9081") );
+const app = new V();
+app.addController("/Hello",C1);
+app.start(9081).then( (server) => console.log("Server has started on PORT: 9081") );
