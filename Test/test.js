@@ -1,4 +1,4 @@
 const { V } = require("../index");
 const app = new V();
-app.load("./controllers");
+app.load("./controllers").static();
 app.start(9081).then( (server) => console.log("Server has started on PORT: 9081") );
