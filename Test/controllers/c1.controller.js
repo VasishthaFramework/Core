@@ -8,7 +8,7 @@ class C1 extends Controller
         res.append("<h1> Entering C1 </h1>");
         req.RequestDispatcher("/Bye").forward(req,res);
         res.append("<h1> Leaving C1 </h1>");
-        res.send();
+        res.close();
     }
 }
 
