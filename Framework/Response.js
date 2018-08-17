@@ -11,7 +11,7 @@ class Response
         this.buffer.append(str);
     }   
 
-    send()
+    close()
     {
         this.res.end(this.buffer.get());
     }
