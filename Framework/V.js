@@ -68,6 +68,15 @@ class V extends EventEmitter
         this._static[path] = filepath; 
     }
 
+    getController(path)
+    {
+        if(path in this._controllers)
+        {
+            return this._controllers[path];
+        }
+        throw new Error("No Such Controller");
+    }
+
     start(port = 80)
     {
         this.port = port;
@@ -91,17 +100,25 @@ class V extends EventEmitter
                 const method = request.method;
                 if (method != 'GET') {
                     var body = '';
-                    request.on('data', function (data) {
-                        body += data;
-                    })
-                    request.on('end', function () {
-                        route.post = qs.parse(body);
-                    });
+                    request.on('data', (data) => body += data);
+                    request.on('end', () => route.post = qs.parse(body));
                 }
                 if(controller != undefined)
                 {
                     console.log(`Controller: ${route.pathname}`);
                     const reqw = new Request(request,route);
+                    reqw.RequestDispatcher = (path) => {
+                        const next = this.getController(path);
+                        return { 
+                            forward: (req,res) => {  
+                                res.buffer = "";   
+                                next[method.toLowerCase()](req,res);       
+                            },
+                            include: (req,res) => {
+                                next[method.toLowerCase()](req,res);
+                            }
+                        }
+                    }
                     const resw = new Response(response);
                     if(method.toLowerCase() in controller)
                     {
