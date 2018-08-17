@@ -6,6 +6,7 @@ const mime = require('mime-types');
 const url = require('url');
 const qs = require('querystring');
 const EventEmitter = require('events');
+const cookie = require('cookie');
 
 // Framework
 const Controller = require('./Controller');
@@ -21,6 +22,7 @@ class V extends EventEmitter
         this._server = null;
         this._controllers = {};
         this._views = {};
+        this.global = {};
     }
 
     load(folder = "./Controllers")
@@ -98,40 +100,41 @@ class V extends EventEmitter
                 }
                 route.post = {};
                 const controller = this._controllers[route.pathname];
-                const method = request.method;
+                let method = request.method;
                 if (method != 'GET') {
                     let body = '';
                     request.on('data', (data) => body += data);
                     request.on('end', () => route.post = qs.parse(body));
                 }
+                method = method.toLowerCase();
                 if(controller !== undefined)
                 {
                     console.log(`Controller: ${route.pathname}`);
                     const reqw = new Request(request,route);
+                    reqw.global = this.global;
                     reqw.RequestDispatcher = (path) => {
                         const next = this.getController(path);
-                        const lmethod = method.toLowerCase();
                         return { 
                             forward: (req,res) => {   
-                                if(lmethod in controller)
+                                if(method in controller)
                                 {
                                     res.buffer.set("");  
-                                    next[lmethod](req,res);      
+                                    next[method](req,res);      
                                     res.buffer.close();
                                 } 
                             },
                             include: (req,res) => {
-                                if(lmethod in controller)
+                                if(method in controller)
                                 {
-                                    next[lmethod](req,res);
+                                    next[method](req,res);
                                 }
                             }
                         }
                     }
                     const resw = new Response(response,new Buffer());
-                    if(method.toLowerCase() in controller)
+                    if(method in controller)
                     {
-                        controller[method.toLowerCase()](reqw,resw);
+                        controller[method](reqw,resw);
                     }
                 } 
                 else
