@@ -1,19 +1,19 @@
 class Response
 {
-    constructor(res)
+    constructor(res,buff)
     {
         this.res = res;
-        this.buffer = "";
+        this.buffer = buff;
     }
 
     append(str)
     {
-        this.buffer += str;
+        this.buffer.append(str);
     }   
 
     send()
     {
-        this.res.end(this.buffer);
+        this.res.end(this.buffer.get());
     }
     
     setHeader(p1,p2)
