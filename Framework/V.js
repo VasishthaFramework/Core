@@ -11,6 +11,7 @@ const EventEmitter = require('events');
 const Controller = require('./Controller');
 const Request = require('./Request');
 const Response = require('./Response');
+const Buffer = require('./Buffer');
 
 class V extends EventEmitter
 {
@@ -99,27 +100,35 @@ class V extends EventEmitter
                 const controller = this._controllers[route.pathname];
                 const method = request.method;
                 if (method != 'GET') {
-                    var body = '';
+                    let body = '';
                     request.on('data', (data) => body += data);
                     request.on('end', () => route.post = qs.parse(body));
                 }
-                if(controller != undefined)
+                if(controller !== undefined)
                 {
                     console.log(`Controller: ${route.pathname}`);
                     const reqw = new Request(request,route);
                     reqw.RequestDispatcher = (path) => {
                         const next = this.getController(path);
+                        const lmethod = method.toLowerCase();
                         return { 
-                            forward: (req,res) => {  
-                                res.buffer = "";   
-                                next[method.toLowerCase()](req,res);       
+                            forward: (req,res) => {   
+                                if(lmethod in controller)
+                                {
+                                    res.buffer.set("");  
+                                    next[lmethod](req,res);      
+                                    res.buffer.close();
+                                } 
                             },
                             include: (req,res) => {
-                                next[method.toLowerCase()](req,res);
+                                if(lmethod in controller)
+                                {
+                                    next[lmethod](req,res);
+                                }
                             }
                         }
                     }
-                    const resw = new Response(response);
+                    const resw = new Response(response,new Buffer());
                     if(method.toLowerCase() in controller)
                     {
                         controller[method.toLowerCase()](reqw,resw);
