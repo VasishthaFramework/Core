@@ -20,6 +20,7 @@ class V extends EventEmitter
     {
         super();
         this._server = null;
+        // Combine all the mappings (Controllers,Static Files,Views) into one
         this._controllers = {};
         this._views = {};
         this.global = {};
@@ -39,22 +40,23 @@ class V extends EventEmitter
 
     static(folder="./public")
     {
-        const abspath = path.resolve(folder);
-        const files  = fs.readdirSync(folder);
-        for(let file of files)
-        {
-            this.addFile({ path:file , filepath:`${abspath}/${file}` });
-        }
-        return this;
+        // Refactoring
     }
 
-    addController({ path , controller })
+    addController({ path , controller , config})
     {
         controller = new controller();
         if(controller instanceof Controller)
         {
             this.emit("ControllerAdded",controller);
-            controller.init();
+            if(config != undefined)
+            {
+                controller.init(config);
+            }
+            else
+            {
+                controller.init({});
+            }
             this._controllers[path] = controller; 
         }
         else
@@ -62,13 +64,6 @@ class V extends EventEmitter
             throw new Error("The Given Class Should be Instance of Controller");
         }
         return this;
-    }
-
-    addFile({ path , filepath })
-    {
-        if(this._static === undefined) this._static = {};
-        path = "/" + path;
-        this._static[path] = filepath; 
     }
 
     getController(path)
@@ -86,18 +81,6 @@ class V extends EventEmitter
         this._server = http.createServer(
             (request,response) => {
                 const route = url.parse(request.url, true);
-                if(this._static !== undefined)
-                {
-                    if(route.pathname in this._static)
-                    {
-                        const filepath = this._static[route.pathname];
-                        const data = fs.readFileSync(filepath);
-                        const type = mime.contentType(path.extname(filepath));
-                        response.setHeader('Content-Type',type);
-                        response.end(data);
-                        return;
-                    }
-                }
                 route.post = {};
                 const controller = this._controllers[route.pathname];
                 let method = request.method;
@@ -107,31 +90,31 @@ class V extends EventEmitter
                     request.on('end', () => route.post = qs.parse(body));
                 }
                 method = method.toLowerCase();
-                if(controller !== undefined)
-                {
-                    console.log(`Controller: ${route.pathname}`);
-                    const reqw = new Request(request,route);
-                    reqw.global = this.global;
-                    reqw.RequestDispatcher = (path) => {
-                        const next = this.getController(path);
-                        return { 
-                            forward: (req,res) => {   
-                                if(method in controller)
-                                {
-                                    res.buffer.set("");  
-                                    next[method](req,res);      
-                                    res.buffer.close();
-                                } 
-                            },
-                            include: (req,res) => {
-                                if(method in controller)
-                                {
-                                    next[method](req,res);
-                                }
+                const reqw = new Request(request,route);
+                reqw.global = this.global;
+                reqw.RequestDispatcher = (path) => {
+                    const next = this.getController(path);
+                    return { 
+                        forward: (req,res) => {   
+                            if(method in controller)
+                            {
+                                res.buffer.set("");  
+                                next[method](req,res);      
+                                res.buffer.close();
+                            } 
+                        },
+                        include: (req,res) => {
+                            if(method in controller)
+                            {
+                                next[method](req,res);
                             }
                         }
                     }
-                    const resw = new Response(response,new Buffer());
+                };
+                const resw = new Response(response,new Buffer());
+                if(controller != undefined)
+                {
+                    console.log(`Controller: ${route.pathname}`);
                     if(method in controller)
                     {
                         controller[method](reqw,resw);
@@ -139,7 +122,17 @@ class V extends EventEmitter
                 } 
                 else
                 {
-                    response.end("<h1>404: No Such Controller :( </h1>");
+
+                    const staticController = this._controllers["static"];
+                    if(staticController != undefined)
+                    {
+                        if(route.pathname in staticController.files)
+                        {
+                            console.log(`File: ${route.pathname}`);
+                            staticController["get"](reqw,resw);
+                        }
+                    }
+                    response.end("<h1>404: No Such Controller 🤷 </h1>");
                 }
             }
         ).listen(this.port,'0.0.0.0');
