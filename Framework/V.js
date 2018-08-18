@@ -2,7 +2,6 @@
 const http = require('http');
 const fs = require('fs');
 const path = require("path");
-const mime = require('mime-types');
 const url = require('url');
 const qs = require('querystring');
 const EventEmitter = require('events');
@@ -13,6 +12,7 @@ const Controller = require('./Controller');
 const Request = require('./Request');
 const Response = require('./Response');
 const Buffer = require('./Buffer');
+const staticserving = require('./static.controller');
 
 class V extends EventEmitter
 {
@@ -40,7 +40,13 @@ class V extends EventEmitter
 
     static(folder="./public")
     {
-        // Refactoring
+        const conf = 
+        {
+            path: staticserving.path,
+            controller: staticserving.controller,
+            config: { folder:folder }
+        }
+        this.addController(conf);
     }
 
     addController({ path , controller , config})
@@ -122,18 +128,17 @@ class V extends EventEmitter
                 } 
                 else
                 {
-
                     const staticController = this._controllers["static"];
-                    if(staticController != undefined)
+                    if(staticController != undefined && route.pathname in staticController.files)
                     {
-                        if(route.pathname in staticController.files)
-                        {
-                            console.log(`File: ${route.pathname}`);
-                            staticController["get"](reqw,resw);
-                        }
+                        console.log(`File: ${route.pathname}`);
+                        staticController["get"](reqw,resw);
                     }
-                    response.setHeader("Content-Type","text/html");
-                    response.end("<meta charset='UTF-8'> <h1>404: No Such Controller 🤷 </h1>");
+                    else
+                    {
+                        response.setHeader("Content-Type","text/html");
+                        response.end("<meta charset='UTF-8'> <h1>404: No Such Controller 🤷 </h1>");
+                    }
                 }
             }
         ).listen(this.port,'0.0.0.0');
