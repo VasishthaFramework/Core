@@ -18,10 +18,8 @@ class StaticController extends Controller
             if (event === 'rename') {
               const filepath = `${abspath}/${file}`;
               if (fs.existsSync(filepath)) {
-                console.log(`Serving a new file: ${file}`);
                 this.addFile({ path:file , filepath:filepath });
               } else {
-                console.log(`Stopped Serving: ${file}`);
                 this.removeFile(`/${file}`);
               }
             }
