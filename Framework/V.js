@@ -13,6 +13,7 @@ const Request = require('./Request');
 const Response = require('./Response');
 const Buffer = require('./Buffer');
 const staticserving = require('./static.controller');
+const defaultcontroller = require('./default.controller');
 
 class V extends EventEmitter
 {
@@ -24,6 +25,7 @@ class V extends EventEmitter
         this._controllers = {};
         this._views = {};
         this.global = {};
+        this.addController(defaultcontroller);
     }
 
     load(folder = "./Controllers")
@@ -136,8 +138,7 @@ class V extends EventEmitter
                     }
                     else
                     {
-                        response.setHeader("Content-Type","text/html");
-                        response.end("<meta charset='UTF-8'> <h1>404: No Such Controller 🤷 </h1>");
+                        this._controllers["*"]["get"](reqw,resw);
                     }
                 }
             }
