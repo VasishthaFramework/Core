@@ -132,7 +132,8 @@ class V extends EventEmitter
                             staticController["get"](reqw,resw);
                         }
                     }
-                    response.end("<h1>404: No Such Controller 🤷 </h1>");
+                    response.setHeader("Content-Type","text/html");
+                    response.end("<meta charset='UTF-8'> <h1>404: No Such Controller 🤷 </h1>");
                 }
             }
         ).listen(this.port,'0.0.0.0');
