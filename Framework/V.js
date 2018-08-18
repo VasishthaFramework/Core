@@ -6,7 +6,7 @@ const mime = require('mime-types');
 const url = require('url');
 const qs = require('querystring');
 const EventEmitter = require('events');
-const cookie = require('cookie');
+const cookie = require('cookie'); // Use this for Cookie Parsing!!!
 
 // Framework
 const Controller = require('./Controller');
@@ -91,7 +91,7 @@ class V extends EventEmitter
                     if(route.pathname in this._static)
                     {
                         const filepath = this._static[route.pathname];
-                        const data = fs.readFileSync(filepath).toString();
+                        const data = fs.readFileSync(filepath);
                         const type = mime.contentType(path.extname(filepath));
                         response.setHeader('Content-Type',type);
                         response.end(data);
