@@ -132,6 +132,11 @@ class V extends EventEmitter
                     }
                 };
                 const resw = new Response(response,new Buffer());
+                resw.view = (name,data) => {
+                    reqw.view = name;
+                    reqw.data = data;
+                    reqw.RequestDispatcher("view").forward(reqw,resw);
+                }
                 if(controller != undefined)
                 {
                     console.log(`Controller: ${route.pathname}`);
