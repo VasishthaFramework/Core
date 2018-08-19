@@ -12,8 +12,9 @@ const Controller = require('./Controller');
 const Request = require('./Request');
 const Response = require('./Response');
 const Buffer = require('./Buffer');
-const staticserving = require('./static.controller');
+const staticcontroller = require('./static.controller');
 const defaultcontroller = require('./default.controller');
+const viewcontroller = require('./view.controller');
 
 class V extends EventEmitter
 {
@@ -21,14 +22,12 @@ class V extends EventEmitter
     {
         super();
         this._server = null;
-        // Combine all the mappings (Controllers,Static Files,Views) into one
-        this._controllers = {};
-        this._views = {};
+        this._mapping = {};
         this.global = {};
         this.addController(defaultcontroller);
     }
 
-    load(folder = "./Controllers")
+    load(folder = "./controllers")
     {
         const abspath = path.resolve(folder);
         const controllers  = fs.readdirSync(folder);
@@ -40,15 +39,28 @@ class V extends EventEmitter
         return this;
     }
 
+    views(folder = "./views")
+    {
+        const conf = 
+        {
+            path: viewcontroller.path,
+            controller: viewcontroller.controller,
+            config: { folder:folder }
+        }
+        this.addController(conf);
+        return this;
+    }
+
     static(folder="./public")
     {
         const conf = 
         {
-            path: staticserving.path,
-            controller: staticserving.controller,
+            path: staticcontroller.path,
+            controller: staticcontroller.controller,
             config: { folder:folder }
         }
         this.addController(conf);
+        return this;
     }
 
     addController({ path , controller , config})
@@ -65,7 +77,7 @@ class V extends EventEmitter
             {
                 controller.init({});
             }
-            this._controllers[path] = controller; 
+            this._mapping[path] = controller; 
         }
         else
         {
@@ -76,9 +88,9 @@ class V extends EventEmitter
 
     getController(path)
     {
-        if(path in this._controllers)
+        if(path in this._mapping)
         {
-            return this._controllers[path];
+            return this._mapping[path];
         }
         throw new Error("No Such Controller");
     }
@@ -90,7 +102,7 @@ class V extends EventEmitter
             (request,response) => {
                 const route = url.parse(request.url, true);
                 route.post = {};
-                const controller = this._controllers[route.pathname];
+                const controller = this._mapping[route.pathname];
                 let method = request.method;
                 if (method != 'GET') {
                     let body = '';
@@ -130,7 +142,7 @@ class V extends EventEmitter
                 } 
                 else
                 {
-                    const staticController = this._controllers["static"];
+                    const staticController = this._mapping["static"];
                     if(staticController != undefined && route.pathname in staticController.files)
                     {
                         console.log(`File: ${route.pathname}`);
@@ -138,7 +150,7 @@ class V extends EventEmitter
                     }
                     else
                     {
-                        this._controllers["*"]["get"](reqw,resw);
+                        this._mapping["*"]["get"](reqw,resw);
                     }
                 }
             }
