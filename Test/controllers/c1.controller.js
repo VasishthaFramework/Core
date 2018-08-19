@@ -6,10 +6,7 @@ class C1 extends Controller
     {
         res.setHeader('Content-Type','text/html');
         res.append("<h1> Entering C1 </h1>");
-        req.view = "two";
-        req.data = {};
-        req.data.msg = "YOLO";
-        req.RequestDispatcher("view").forward(req,res);
+        res.view("two",{ msg:"Hello Goodbye!" });
         res.append("<h1> Leaving C1 </h1>");
     }
 }
