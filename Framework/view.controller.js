@@ -64,7 +64,7 @@ class ViewController extends Controller
                 res.setHeader('Content-Type','text/html');
                 if(mapping.ejs)
                 {
-
+                    res.append(ejs.render(data, req.data));
                 }
                 else
                 {
