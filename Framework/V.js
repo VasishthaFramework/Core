@@ -104,11 +104,9 @@ class V extends EventEmitter
                 route.post = {};
                 const controller = this._mapping[route.pathname];
                 let method = request.method;
-                if (method != 'GET') {
-                    let body = '';
-                    request.on('data', (data) => body += data);
-                    request.on('end', () => route.post = qs.parse(body));
-                }
+                let body = '';
+                request.on('data', (data) => body += data);
+                request.on('end', () => route.post = qs.parse(body));
                 method = method.toLowerCase();
                 const reqw = new Request(request,route);
                 reqw.global = this.global;
