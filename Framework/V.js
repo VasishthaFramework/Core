@@ -106,7 +106,7 @@ class V extends EventEmitter
                 let method = request.method;
                 let body = '';
                 request.on('data', (data) => body += data);
-                request.on('end', () => route.post = qs.parse(body));
+                request.on('end', () => route.post = qs.parse(body));a
                 method = method.toLowerCase();
                 const reqw = new Request(request,route);
                 reqw.global = this.global;
