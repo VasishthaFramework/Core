@@ -28,12 +28,14 @@ class Loader
         {
             fs.watch(abspath, (event, file) => {
                 if (event === 'rename') {
-                  const filepath = `${abspath}/${file}`;
-                  if (fs.existsSync(filepath)) {
-                    onCreate(file,filepath);
-                  } else {
-                    onDelete(file,filepath);
-                  }
+                    const filepath = `${abspath}/${file}`;
+                    if(!fs.lstatSync(filepath).isDirectory()) {
+                        if (fs.existsSync(filepath)) {
+                            onCreate(file,filepath);
+                        } else {
+                            onDelete(file,filepath);
+                        }
+                    }
                 }
               }
             );
