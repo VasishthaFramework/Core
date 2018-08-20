@@ -1,56 +1,47 @@
 const Controller = require('./Controller');
+const Loader = require('./Loader');
 const fs = require('fs');
-const path = require("path");
 const ejs = require('ejs');
-
 
 class ViewController extends Controller
 {
     init(config)
     {
         const folder = config.folder;
-        const abspath = path.resolve(folder);
-        const files  = fs.readdirSync(folder);
-        let filepath = "";
-        for(let file of files)
-        {
-            filepath = `${abspath}/${file}`;
-            this.addFile({ name:file , filepath:filepath });
-        }
-        fs.watch(abspath, (event, file) => {
-            if (event === 'rename') {
-              const filepath = `${abspath}/${file}`;
-              if (fs.existsSync(filepath)) {
-                this.addFile({ name:file , filepath:filepath });
-              } else {
-                this.removeFile(name[0]);
-              }
-            }
-          }
+        this.loader = new Loader(folder);
+        const add = (file,filepath) => this.addFile({ path:file , filepath:filepath });
+        this.loader.start( 
+            add,
+            add,
+            (file,filepath) => this.removeFile(file)
         );
     }
 
-    addFile({ name , filepath })
+    addFile({ path , filepath })
     {
         if(this.files === undefined) this.files = {};
         const mapping = {};
-        name = name.split(".").slice(0,name.length);
-        mapping.name = name[0];
+        path = path.split(".");
+        let pathname = path.splice(0,path.length-1).join(".");
+        let extension = path[path.length-1];
+        mapping.path = pathname;
         mapping.filepath = filepath;
-        if(name[1] == "ejs")
+        if(extension == "ejs")
         {
-            mapping.ejs = true;
+            mapping.template = true;
         }
         else
         {
-            mapping.ejs = false;
+            mapping.template = false;
         }
-        this.files[mapping.name] = mapping; 
+        this.files[mapping.path] = mapping; 
     }
 
     removeFile(path)
     {
-        delete this.files[path];
+        path = path.split(".");
+        let pathname = path.splice(0,path.length-1).join(".");
+        delete this.files[pathname];
     }
 
     get(req,res)
@@ -62,7 +53,7 @@ class ViewController extends Controller
                 const mapping = this.files[req.view];
                 const data = fs.readFileSync(mapping.filepath).toString();
                 res.setHeader('Content-Type','text/html');
-                if(mapping.ejs)
+                if(mapping.template)
                 {
                     res.append(ejs.render(data, req.data));
                 }
