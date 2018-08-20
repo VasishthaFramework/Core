@@ -9,13 +9,8 @@ class A1 extends Controller
 
     get(req,res)
     {
-        res.append("<h1> Entering A1 </h1>");
-        const times = req.global.times;
-        for(let i = 0; i < times;i++)
-        {
-            res.append("<h2>" + this.message + "</h2>");    
-        }
-        res.append("<h1> Leaving A1 </h1>");
+        res.append("<h1> A1 </h1>");
+        res.close();
     }
 }
 
