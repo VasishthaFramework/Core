@@ -15,6 +15,7 @@ const Buffer = require('./Buffer');
 const staticcontroller = require('./static.controller');
 const defaultcontroller = require('./default.controller');
 const viewcontroller = require('./view.controller');
+const Loader = require('./Loader');
 
 class V extends EventEmitter
 {
@@ -29,23 +30,12 @@ class V extends EventEmitter
 
     load(folder = "./controllers")
     {
-        const abspath = path.resolve(folder);
-        const controllers  = fs.readdirSync(folder);
-        for(let controller of controllers)
-        {
-            controller = controller.split(".");
-            controller = controller.slice(0,controller.length-1).join(".");
-            this.addController(require(`${abspath}/${controller}`));
-        }
-        fs.watch(abspath, (event, file) => {
-            if (event === 'rename') {
-              const filepath = `${abspath}/${file}`;
-              file = file.split(".").slice(0,controller.length).join(".");
-              if (fs.existsSync(filepath)) {
-                this.addController(require(`${abspath}/${file}`));
-              }
-            }
-          }
+        this.loader = new Loader(folder);
+        const add = (file,filepath) => this.addController(require(filepath));
+        this.loader.start(
+            add,
+            add,
+            (file,filepath) => {}
         );
         return this;
     }
