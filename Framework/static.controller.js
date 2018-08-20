@@ -1,6 +1,7 @@
 const Controller = require('./Controller');
+const Loader = require('./Loader');
 const fs = require('fs');
-const path = require("path");
+const path = require('path');
 const mime = require('mime-types');
 
 class StaticController extends Controller
@@ -8,22 +9,12 @@ class StaticController extends Controller
     init(config)
     {
         const folder = config.folder;
-        const abspath = path.resolve(folder);
-        const files  = fs.readdirSync(folder);
-        for(let file of files)
-        {
-            this.addFile({ path:file , filepath:`${abspath}/${file}` });
-        }
-        fs.watch(abspath, (event, file) => {
-            if (event === 'rename') {
-              const filepath = `${abspath}/${file}`;
-              if (fs.existsSync(filepath)) {
-                this.addFile({ path:file , filepath:filepath });
-              } else {
-                this.removeFile(`/${file}`);
-              }
-            }
-          }
+        this.loader = new Loader(folder);
+        const add = (file,filepath) => this.addFile({ path:file , filepath:filepath });
+        this.loader.start(
+            add,
+            add,
+            (file,filepath) => this.removeFile(file)
         );
     }
 
@@ -36,6 +27,7 @@ class StaticController extends Controller
 
     removeFile(path)
     {
+        path = `/${path}`;
         delete this.files[path];
     }
 
