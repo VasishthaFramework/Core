@@ -33,9 +33,20 @@ class V extends EventEmitter
         const controllers  = fs.readdirSync(folder);
         for(let controller of controllers)
         {
-            controller = controller.split(".").slice(0,controller.length).join(".");
+            controller = controller.split(".");
+            controller = controller.slice(0,controller.length-1).join(".");
             this.addController(require(`${abspath}/${controller}`));
         }
+        fs.watch(abspath, (event, file) => {
+            if (event === 'rename') {
+              const filepath = `${abspath}/${file}`;
+              file = file.split(".").slice(0,controller.length).join(".");
+              if (fs.existsSync(filepath)) {
+                this.addController(require(`${abspath}/${file}`));
+              }
+            }
+          }
+        );
         return this;
     }
 
@@ -46,7 +57,7 @@ class V extends EventEmitter
             path: viewcontroller.path,
             controller: viewcontroller.controller,
             config: { folder:folder }
-        }
+        };
         this.addController(conf);
         return this;
     }
@@ -58,12 +69,12 @@ class V extends EventEmitter
             path: staticcontroller.path,
             controller: staticcontroller.controller,
             config: { folder:folder }
-        }
+        };
         this.addController(conf);
         return this;
     }
 
-    addController({ path , controller , config})
+    addController({ path , controller , config })
     {
         controller = new controller();
         if(controller instanceof Controller)
@@ -86,6 +97,11 @@ class V extends EventEmitter
         return this;
     }
 
+    removeController()
+    {
+
+    }
+
     getController(path)
     {
         if(path in this._mapping)
@@ -106,7 +122,7 @@ class V extends EventEmitter
                 let method = request.method;
                 let body = '';
                 request.on('data', (data) => body += data);
-                request.on('end', () => route.post = qs.parse(body));a
+                request.on('end', () => route.post = qs.parse(body));
                 method = method.toLowerCase();
                 const reqw = new Request(request,route);
                 reqw.global = this.global;
