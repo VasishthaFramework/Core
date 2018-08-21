@@ -6,6 +6,7 @@ const url = require('url');
 const qs = require('querystring');
 const EventEmitter = require('events');
 const cookie = require('cookie'); // Use this for Cookie Parsing!!!
+const chalk = require('chalk');
 
 // Framework
 const Controller = require('./Controller');
@@ -19,10 +20,11 @@ const Loader = require('./Loader');
 
 class V extends EventEmitter
 {
-    constructor()
+    constructor(disable = false)
     {
         super();
         this._server = null;
+        this.disable = disable;
         this._mapping = {};
         this.global = {};
         this.addController(defaultcontroller);
@@ -138,7 +140,7 @@ class V extends EventEmitter
                 }
                 if(controller != undefined)
                 {
-                    console.log(`Controller: ${route.pathname}`);
+                    if(!this.disable) console.log(chalk`{bold Controller:} {green ${route.pathname}}`);
                     if(method in controller)
                     {
                         controller[method](reqw,resw);
@@ -149,7 +151,7 @@ class V extends EventEmitter
                     const staticController = this._mapping["static"];
                     if(staticController != undefined && route.pathname in staticController.files)
                     {
-                        console.log(`File: ${route.pathname}`);
+                        if(!this.disable) console.log(chalk`{bold File:} {green ${route.pathname}}`);
                         staticController["get"](reqw,resw);
                     }
                     else
@@ -160,6 +162,7 @@ class V extends EventEmitter
             }
         ).listen(this.port,'0.0.0.0');
         this.emit("Start",this._server);
+        if(!this.disable) console.log(chalk`{green Server has started on} {bold {red PORT: ${this.port}}}`);
         return Promise.resolve(this._server);
     }
 
