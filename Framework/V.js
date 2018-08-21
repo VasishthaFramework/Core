@@ -12,9 +12,9 @@ const Controller = require('./Controller');
 const Request = require('./Request');
 const Response = require('./Response');
 const Buffer = require('./Buffer');
-const staticcontroller = require('./static.controller');
-const defaultcontroller = require('./default.controller');
-const viewcontroller = require('./view.controller');
+const staticcontroller = require('./stdctrs/static.controller');
+const defaultcontroller = require('./stdctrs/default.controller');
+const viewcontroller = require('./stdctrs/view.controller');
 const Loader = require('./Loader');
 
 class V extends EventEmitter
