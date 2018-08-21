@@ -87,11 +87,6 @@ class V extends EventEmitter
         return this;
     }
 
-    removeController()
-    {
-
-    }
-
     getController(path)
     {
         if(path in this._mapping)
