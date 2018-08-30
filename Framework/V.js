@@ -5,7 +5,7 @@ const path = require("path");
 const url = require('url');
 const qs = require('querystring');
 const EventEmitter = require('events');
-const cookie = require('cookie'); // Use this for Cookie Parsing!!!
+const cookie = require('cookie');
 const chalk = require('chalk');
 
 // Framework
@@ -105,6 +105,7 @@ class V extends EventEmitter
             (request,response) => {
                 const route = url.parse(request.url, true);
                 route.post = {};
+                const cookies = cookie.parse(request.headers.cookie || '');
                 const controller = this._mapping[route.pathname];
                 let method = request.method;
                 let body = '';
@@ -113,6 +114,7 @@ class V extends EventEmitter
                 method = method.toLowerCase();
                 const reqw = new Request(request,route);
                 reqw.global = this.global;
+                reqw.cookies = cookies;
                 reqw.RequestDispatcher = (path) => {
                     const next = this.getController(path);
                     return { 
