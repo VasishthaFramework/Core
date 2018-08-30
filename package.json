@@ -1,5 +1,5 @@
 {
-  "name": "@vasishtha/core",
+  "name": "@archanpatkar/vasishtha-core",
   "version": "1.0.0",
   "description": "A MVC Framework for building Web Applications on Node.js",
   "main": "index.js",
