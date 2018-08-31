@@ -18,7 +18,7 @@ class Loader
         {
             filepath = `${abspath}/${file}`;
             if(fs.lstatSync(filepath).isDirectory()) {
-                this.start(onLoad,onCreate,onDelete,folder = filepath);
+                this.start(onLoad,onCreate,onDelete,filepath);
             }
             else {
                 onLoad(file,filepath);
