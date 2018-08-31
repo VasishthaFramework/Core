@@ -1,5 +1,5 @@
 class Controller {
     init(){}
-    destroy() {}
+    destroy(){}
 }
 module.exports = Controller;
