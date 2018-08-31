@@ -1,4 +1,4 @@
-### <img src="./Resources/VasishthaComplete.svg">
+### <img src="Resources/VasishthaComplete.svg">
 ### A Framework for building Web Applications on Node.js
 
 ## Goal 
