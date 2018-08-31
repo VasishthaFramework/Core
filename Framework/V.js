@@ -30,7 +30,7 @@ class V extends EventEmitter
         this.folder = path.resolve(".");
         this.global = {};
         this.global.folder = this.folder;
-        this.globals(globalfile);
+        // this.globals(globalfile);
         this.addController(defaultcontroller);
     }
 
@@ -98,7 +98,7 @@ class V extends EventEmitter
         }
         else
         {
-            throw new Error("The Given Class Should be Instance of Controller");
+            throw new Error("The given class should be the subclass of Controller");
         }
         return this;
     }
