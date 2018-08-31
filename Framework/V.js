@@ -1,7 +1,8 @@
 // Dependancies
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
-const path = require("path");
+const path = require('path');
 const url = require('url');
 const qs = require('querystring');
 const EventEmitter = require('events');
@@ -98,71 +99,78 @@ class V extends EventEmitter
         throw new Error("No Such Controller");
     }
 
-    start(port = 80)
+    start(port = 80,options=undefined)
     {
         this.port = port;
-        this._server = http.createServer(
-            (request,response) => {
-                const route = url.parse(request.url, true);
-                route.post = {};
-                const cookies = cookie.parse(request.headers.cookie || '');
-                const controller = this._mapping[route.pathname];
-                let method = request.method;
-                let body = '';
-                request.on('data', (data) => body += data);
-                request.on('end', () => route.post = qs.parse(body));
-                method = method.toLowerCase();
-                const reqw = new Request(request,route);
-                reqw.global = this.global;
-                reqw.cookies = cookies;
-                reqw.RequestDispatcher = (path) => {
-                    const next = this.getController(path);
-                    return { 
-                        forward: (req,res) => {   
-                            if(method in controller)
-                            {
-                                res.buffer.set("");  
-                                next[method](req,res);      
-                                res.buffer.close();
-                            } 
-                        },
-                        include: (req,res) => {
-                            if(method in controller)
-                            {
-                                next[method](req,res);
-                            }
+        const handler = (request,response) => {
+            const route = url.parse(request.url, true);
+            route.post = {};
+            const cookies = cookie.parse(request.headers.cookie || '');
+            const controller = this._mapping[route.pathname];
+            let method = request.method;
+            let body = '';
+            request.on('data', (data) => body += data);
+            request.on('end', () => route.post = qs.parse(body));
+            method = method.toLowerCase();
+            const reqw = new Request(request,route);
+            reqw.global = this.global;
+            reqw.cookies = cookies;
+            reqw.RequestDispatcher = (path) => {
+                const next = this.getController(path);
+                return { 
+                    forward: (req,res) => {   
+                        if(method in controller)
+                        {
+                            res.buffer.set("");  
+                            next[method](req,res);      
+                            res.buffer.close();
+                        } 
+                    },
+                    include: (req,res) => {
+                        if(method in controller)
+                        {
+                            next[method](req,res);
                         }
                     }
-                };
-                const resw = new Response(response,new Buffer());
-                resw.view = (name,data) => {
-                    reqw.view = name;
-                    reqw.data = data;
-                    reqw.RequestDispatcher("view").forward(reqw,resw);
                 }
-                if(controller != undefined)
+            };
+            const resw = new Response(response,new Buffer());
+            resw.view = (name,data) => {
+                reqw.view = name;
+                reqw.data = data;
+                reqw.RequestDispatcher("view").forward(reqw,resw);
+            }
+            if(controller != undefined)
+            {
+                if(!this.disable) console.log(chalk`{bold Controller:} {green ${route.pathname}}`);
+                if(method in controller)
                 {
-                    if(!this.disable) console.log(chalk`{bold Controller:} {green ${route.pathname}}`);
-                    if(method in controller)
-                    {
-                        controller[method](reqw,resw);
-                    }
-                } 
+                    controller[method](reqw,resw);
+                }
+            } 
+            else
+            {
+                const staticController = this._mapping["static"];
+                if(staticController != undefined && route.pathname in staticController.files)
+                {
+                    if(!this.disable) console.log(chalk`{bold File:} {green ${route.pathname}}`);
+                    staticController["get"](reqw,resw);
+                }
                 else
                 {
-                    const staticController = this._mapping["static"];
-                    if(staticController != undefined && route.pathname in staticController.files)
-                    {
-                        if(!this.disable) console.log(chalk`{bold File:} {green ${route.pathname}}`);
-                        staticController["get"](reqw,resw);
-                    }
-                    else
-                    {
-                        this._mapping["*"]["get"](reqw,resw);
-                    }
+                    this._mapping["*"]["get"](reqw,resw);
                 }
             }
-        ).listen(this.port,'0.0.0.0');
+        };
+        if(options == undefined)
+        {
+            this._server = http.createServer(handler);
+        }
+        else
+        {
+            this._server = https.createServer(options,handler);
+        }
+        this._server.listen(this.port,'0.0.0.0');
         this.emit("Start",this._server);
         if(!this.disable) console.log(chalk`{green Server has started on} {bold {red PORT: ${this.port}}}`);
         return Promise.resolve(this._server);
