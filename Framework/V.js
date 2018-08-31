@@ -21,14 +21,27 @@ const Loader = require('./Loader');
 
 class V extends EventEmitter
 {
-    constructor(disable = false)
+    constructor(disable = false,globalfile="global.json")
     {
         super();
         this._server = null;
         this.disable = disable;
         this._mapping = {};
+        this.folder = path.resolve(".");
         this.global = {};
+        this.global.folder = this.folder;
+        this.globals(globalfile);
         this.addController(defaultcontroller);
+    }
+
+    globals(filename)
+    {
+        const filepath = `${this.folder}/${filename}`;
+        if(fs.existsSync(filepath))
+        {
+            const temp = JSON.parse(fs.readFileSync(filepath,{encoding:"utf-8"}));
+            this.global = Object.assign(this.global, temp);
+        }
     }
 
     load(folder = "./controllers")
