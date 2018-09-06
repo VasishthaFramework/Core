@@ -4,6 +4,8 @@ class StateController extends Controller
 {
     init(config)
     {
+       // Can Configure the Container in Perm - Comb of CRUD 
+       // ( Read Only, Update Only, Delete Only, Write Only, Read and Write, Read and Update .... )
        // State Container Name to be provided
        // Transformers and Mutators
        // Rules Enforcers to initialized and Singular Level to the Container Level
