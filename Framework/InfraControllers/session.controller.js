@@ -11,7 +11,6 @@ class SessionController extends Controller
     {  
 
     }
-
 }
 
 module.exports = SessionController;
