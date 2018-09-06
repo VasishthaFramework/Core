@@ -131,7 +131,7 @@ class V extends EventEmitter
             reqw.RequestDispatcher = (path) => {
                 const next = this.getController(path);
                 return { 
-                    forward: (req,res) => {   
+                    forward: (req,res) => {
                         if(method in controller)
                         {
                             res.buffer.set("");  
