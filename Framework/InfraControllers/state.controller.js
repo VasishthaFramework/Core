@@ -4,6 +4,8 @@ class StateController extends Controller
 {
     init(config)
     {
+        this.name = config.name;
+        this.operations = confing.operations;
        // Can Configure the Container in Perm - Comb of CRUD 
        // ( Read Only, Update Only, Delete Only, Write Only, Read and Write, Read and Update .... )
        // State Container Name to be provided
@@ -14,13 +16,16 @@ class StateController extends Controller
     get(req,res)
     {
         const op = String(req.query.operation).toLowerCase();
-        switch(op)
+        if(op in this.operations)
         {
-            case "create":break;
-            case "read":break;
-            case "update":break;
-            case "delete":break;
-            default:throw new Error("No Such Opertation! Only supports CRUD");
+            switch(op)
+            {
+                case "create":break;
+                case "read":break;
+                case "update":break;
+                case "delete":break;
+                default:throw new Error("No Such Opertation! Only supports CRUD");
+            }
         }
     }
 
